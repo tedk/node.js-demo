@@ -56,20 +56,16 @@ function showNotification() {
             RequestPermission(showNotification);
         } else {
 		var popup = null;
-		try {
-	        	popup = window.webkitNotifications.createHTMLNotification('notification.php?time=' + notification.time + '&app=' + notification.app + '&text=' + notification.text + '&num=' + notification.num + '&icon=' + notification.icon + '&iconPadding=' + notification.iconPadding);
-		} catch (err) {
-			//createHTMLNotification has been removed from some spec: https://plus.google.com/u/0/+GoogleChromeDevelopers/posts/8vWo8hq4pDm
-			var iconstr = null;
-			if(notification.icon != undefined && notification.icon != null && notification.icon != "undefined") {
-				iconstr = notification.icon.replace(/_/g,'/').replace(/-/g,'+');
-				for(var i = 0; i < notification.iconPadding; ++i) {
-					iconstr += '=';
-				}
-				iconstr = 'data:image/png;base64,' + iconstr;
+		//createHTMLNotification has been removed from some spec: https://plus.google.com/u/0/+GoogleChromeDevelopers/posts/8vWo8hq4pDm
+		var iconstr = null;
+		if(notification.icon != undefined && notification.icon != null && notification.icon != "undefined") {
+			iconstr = notification.icon.replace(/_/g,'/').replace(/-/g,'+');
+			for(var i = 0; i < notification.iconPadding; ++i) {
+				iconstr += '=';
 			}
-			popup = window.webkitNotifications.createNotification(iconstr, notification.app, notification.text);
+			iconstr = 'data:image/png;base64,' + iconstr;
 		}
+		popup = window.webkitNotifications.createNotification(iconstr, notification.app, notification.text);
 	        popup.show();
 		var timeout = document.getElementById('timeoutBox').value;
 		if(timeout && timeout != "" && timeout > 0) {

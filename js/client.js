@@ -58,7 +58,7 @@ function showNotification() {
 		var popup = null;
 		//createHTMLNotification has been removed from some spec: https://plus.google.com/u/0/+GoogleChromeDevelopers/posts/8vWo8hq4pDm
 		var iconstr = null;
-		if(notification.icon != undefined && notification.icon != null && notification.icon != "undefined") {
+		if(notification.icon != undefined && notification.icon != null && notification.icon != "undefined" && notification.icon != "null") {
 			iconstr = notification.icon.replace(/_/g,'/').replace(/-/g,'+');
 			for(var i = 0; i < notification.iconPadding; ++i) {
 				iconstr += '=';

@@ -82,30 +82,22 @@ function showNotification() {
 			        }, timeout * 1000);
 			}
 		}
-		var row = '<tr><td class="spacer" colspan="4"/></tr>';
+		var row = '<tr><td class="spacer" colspan="3"/></tr>';
 		row += '<tr><td rowspan="2">';
 		if(iconstr !== null) {
 			row += '<img src="' + iconstr + '"/>';
 		}
 		row += '</td><td class="appname">' + notification.app + '</td>';
 		row += '<td class="time">' + notification.time + '</td>';
-		row += '<td class="closeCell"><div class="close">x</div></td>';
 		row += '</tr><tr>';
-		row += '<td class="text" colspan="3">';
+		row += '<td class="text" colspan="2">';
 		row += notification.text;
 		row += '</td></tr>';
 		var rowDom = $(row);
-		rowDom.find('.close').hide().css('cursor', 'pointer').click(function () {
+		rowDom.bind("contextmenu", function (e) {
 			rowDom.fadeOut('slow', function() { rowDom.remove() });
+			return false;
 		});
-		rowDom.hover(
-			function() {
-				rowDom.find('.close').stop(true, true).delay(500).fadeIn('fast');
-			},
-			function() {
-				rowDom.find('.close').stop(true, true).fadeOut('fast');
-			}
-		);
 		rowDom.hide().prependTo('#notificationTable tbody').fadeIn('slow');
 	}
 }

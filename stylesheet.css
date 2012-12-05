@@ -49,22 +49,6 @@ td.appname {
 td.time {
 	white-space: nowrap;
 	padding-bottom: 0px;
-	padding-right: 0px;
 	font-size: 14px;
-}
-
-td.closeCell {
-	padding-top: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
 	text-align: right;
-}
-
-.close {
-	font-weight: bold;
-	font-size: 20px;
-	padding-top: 0px;
-	padding-bottom: 0px;
-	/*padding-left: 0px;
-	padding-right: 0px;*/
 }

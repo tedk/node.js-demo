@@ -41,11 +41,17 @@ function display_event(jsonstr){
 $(document).ready(function() {
 	//begin listening for updates right away
 	longPoll_feed();
-});
 
-if (!window.webkitNotifications) {
-	alert('Sorry , your browser does not support desktop notifications.');
-}
+	if (!window.webkitNotifications) {
+		document.getElementById('enabledCheck').checked = false;
+		document.getElementById('enabledCheck').disabled = true;
+		document.getElementById('timeoutBox').disabled = true;
+		alert('Sorry , your browser does not support desktop notifications.');
+	} else {
+		//check permissions
+		showNotification();
+	}
+});
 
 function RequestPermission (callback){
 	window.webkitNotifications.requestPermission(callback);
@@ -55,7 +61,8 @@ function showNotification() {
 	if (window.webkitNotifications.checkPermission() > 0) {
             RequestPermission(showNotification);
         } else {
-		var popup = null;
+		if(notification === null)
+			return;
 		//createHTMLNotification has been removed from some spec: https://plus.google.com/u/0/+GoogleChromeDevelopers/posts/8vWo8hq4pDm
 		var iconstr = null;
 		if(notification.icon != undefined && notification.icon != null && notification.icon != "undefined" && notification.icon != "null") {
@@ -65,13 +72,40 @@ function showNotification() {
 			}
 			iconstr = 'data:image/png;base64,' + iconstr;
 		}
-		popup = window.webkitNotifications.createNotification(iconstr, notification.app, notification.text);
-	        popup.show();
-		var timeout = document.getElementById('timeoutBox').value;
-		if(timeout && timeout != "" && timeout > 0) {
-		        setTimeout(function(){
-				popup.cancel();
-		        }, timeout);
+		if(document.getElementById('enabledCheck').checked) {
+			var popup = window.webkitNotifications.createNotification(iconstr, notification.app, notification.text);
+		        popup.show();
+			var timeout = document.getElementById('timeoutBox').value;
+			if(timeout && timeout != "" && !isNaN(timeout) && timeout > 0) {
+			        setTimeout(function(){
+					popup.cancel();
+			        }, timeout * 1000);
+			}
 		}
+		var row = '<tr><td class="spacer" colspan="4"/></tr>';
+		row += '<tr><td rowspan="2">';
+		if(iconstr !== null) {
+			row += '<img src="' + iconstr + '"/>';
+		}
+		row += '</td><td class="appname">' + notification.app + '</td>';
+		row += '<td class="time">' + notification.time + '</td>';
+		row += '<td class="closeCell"><div class="close">x</div></td>';
+		row += '</tr><tr>';
+		row += '<td class="text" colspan="3">';
+		row += notification.text;
+		row += '</td></tr>';
+		var rowDom = $(row);
+		rowDom.find('.close').hide().css('cursor', 'pointer').click(function () {
+			rowDom.fadeOut('slow', function() { rowDom.remove() });
+		});
+		rowDom.hover(
+			function() {
+				rowDom.find('.close').stop(true, true).delay(500).fadeIn('fast');
+			},
+			function() {
+				rowDom.find('.close').stop(true, true).fadeOut('fast');
+			}
+		);
+		rowDom.hide().prependTo('#notificationTable tbody').fadeIn('slow');
 	}
 }

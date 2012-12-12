@@ -1,5 +1,5 @@
 var http = require("http"),
-    util = require("util"),
+    sys = require("sys"),
     url = require("url"),
     qs = require("querystring");
 
@@ -23,29 +23,30 @@ http.createServer(function (req, res) {
 	// or
 	// Trigger the 404
 	handler  = urlMap[url.parse(req.url).pathname] || notFound;
-
+	
 	var json = "";
-
+	
 	if(req.method === "POST"){
 		// We need to process the post but we need to wait until the request's body is available to get the field/value pairs.
 		req.body = '';
-
+		
 		req.addListener('data', function (chunk) {
 									// Build the body from the chunks sent in the post.
 				 					req.body = req.body + chunk;
 								})
 			.addListener('end', function () {
-									json = qs.parse(req.body);
+									json = req.body;
 									handler(req, res, json);
 		      					}
 						);
 	}else{
 		handler(req, res);
 	}
-
+	
 	res.simpleJSON = function (code, obj) {
 		var body = JSON.stringify(obj);
 		res.writeHead(code, {
+							"Access-Control-Allow-Origin": "*",
 							"Content-Type": "text/json",
 							"Content-Length": body.length
 						}
@@ -64,12 +65,14 @@ var feed = new function () {
 		// Append the new item.
 		real_time_items.push( json );
 
+    //sys.puts(json);
+
 		// Log it to the console
-		//util.puts(new Date() + ": " + json + " pushed");
+		//sys.puts(new Date() + ": " + JSON.parse(json).type + " pushed");
 
 		// As soon as something is pushed, call the query callback
 		while (callbacks.length > 0)
-			callbacks.shift().callback([json]);
+			callbacks.shift().callback([JSON.parse(json)]);
 
 		// Make sur we don't flood the server
 		while (real_time_items.length > ITEMS_BACKLOG)
@@ -78,7 +81,7 @@ var feed = new function () {
 
 	this.query = function (since, callback) {
 		var matching = [];
-
+			
 		for (var i = 0; i < real_time_items.length; i++) {
 			var real_time_item = real_time_items[i];
 			if (real_time_item.timestamp > since)

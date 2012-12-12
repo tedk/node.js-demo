@@ -24,17 +24,14 @@ function longPoll_feed () {
 
 var notification = null;
 
-function display_event(jsonstr){
-	// oh so hacky :(
-	jsonstr = JSON.stringify(jsonstr);
-	jsonstr = jsonstr.substring(3, jsonstr.length - 6).replace(/\\\\/g,"\\").replace(/\\\"/g,"\"");
-	json = JSON.parse(jsonstr); 
-	
-	switch(json.type){
-		case 'notification':
-			notification = json.content;
-			showNotification();
-		break;
+function display_event(json){
+	for( i in json) {
+		switch(json[i].type){
+			case 'notification':
+				notification = json[i].content;
+				showNotification();
+			break;
+		}
 	}
 }
 

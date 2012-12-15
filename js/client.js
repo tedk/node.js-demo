@@ -64,10 +64,16 @@ function showNotification() {
 		var iconstr = null;
 		if(notification.icon != undefined && notification.icon != null && notification.icon != "undefined" && notification.icon != "null") {
 			iconstr = notification.icon.replace(/_/g,'/').replace(/-/g,'+');
-			for(var i = 0; i < notification.iconPadding; ++i) {
-				iconstr += '=';
+		}
+		if(notification.sound != undefined && notification.sound != null && notification.sound != "undefined" && notification.sound != "null") {
+			soundstr = notification.sound.replace(/_/g,'/').replace(/-/g,'+');
+			if(document.getElementById('soundCheck').checked) {
+				var audio = $('<audio>');
+				var source = $('<source>').attr('src', soundstr).appendTo(audio);
+				audio.bind('ended', function () { audio.remove(); });
+				audio.appendTo('body');	
+				audio[0].play();
 			}
-			iconstr = 'data:image/png;base64,' + iconstr;
 		}
 		if(document.getElementById('enabledCheck').checked) {
 			var popup = window.webkitNotifications.createNotification(iconstr, notification.app, notification.text);

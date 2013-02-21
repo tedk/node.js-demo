@@ -9,14 +9,28 @@ var urlMap = {
 	'/real_time_feed' : function (req, res) {
 							var since = parseInt(qs.parse(url.parse(req.url).query).since, 10);
 							feed.query(since, function (data) {
-								res.simpleJSON(200, data);
+								simpleJSON(res, 200, data);
 							});
 						},
 	'/send_feed_item' : function (req, res, json) {
 							feed.appendMessage( json );
-							res.simpleJSON(200, {});
+							simpleJSON(res, 200, {});
 						}
-}
+};
+
+var simpleJSON = function (res, code, obj) {
+	var body = JSON.stringify(obj);
+	try {
+		res.writeHead(code, {
+ 			"Access-Control-Allow-Origin": "*",
+			"Content-Type": "text/json",
+			"Content-Length": body.length
+		});
+		res.end(body);
+	} catch (e) {
+		console.log(e);
+	}
+};
 
 http.createServer(function (req, res) {
 	// Get the url and associate the function to the handler
@@ -43,16 +57,6 @@ http.createServer(function (req, res) {
 		handler(req, res);
 	}
 	
-	res.simpleJSON = function (code, obj) {
-		var body = JSON.stringify(obj);
-		res.writeHead(code, {
-							"Access-Control-Allow-Origin": "*",
-							"Content-Type": "text/json",
-							"Content-Length": body.length
-						}
-					);
-		res.end(body);
-	};
 }).listen(8001);
 
 

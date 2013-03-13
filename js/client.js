@@ -55,7 +55,7 @@ function RequestPermission (callback){
 }
 
 function showNotification() {
-	if (window.webkitNotifications.checkPermission() > 0) {
+	if (window.webkitNotifications != null && window.webkitNotifications.checkPermission() > 0) {
             RequestPermission(showNotification);
         } else {
 		if(notification === null)

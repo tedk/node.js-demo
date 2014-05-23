@@ -72,7 +72,7 @@ var feed = new function () {
     //sys.puts(json);
 
 		// Log it to the console
-		//sys.puts(new Date() + ": " + JSON.parse(json).type + " pushed");
+		sys.puts(new Date() + ": " + JSON.parse(json).type + " pushed");
 
 		// As soon as something is pushed, call the query callback
 		while (callbacks.length > 0)

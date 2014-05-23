@@ -22,13 +22,13 @@ function longPoll_feed () {
 		});
 }
 
-var notification = null;
+var lastNotification = null;
 
 function display_event(json){
 	for( i in json) {
 		switch(json[i].type){
 			case 'notification':
-				notification = json[i].content;
+				lastNotification = json[i].content;
 				showNotification();
 			break;
 		}
@@ -39,7 +39,7 @@ $(document).ready(function() {
 	//begin listening for updates right away
 	longPoll_feed();
 
-	if (!window.webkitNotifications) {
+	if (!("Notification" in window)) {
 		document.getElementById('enabledCheck').checked = false;
 		document.getElementById('enabledCheck').disabled = true;
 		document.getElementById('timeoutBox').disabled = true;
@@ -51,22 +51,21 @@ $(document).ready(function() {
 });
 
 function RequestPermission (callback){
-	window.webkitNotifications.requestPermission(callback);
+	Notification.requestPermission(callback);
 }
 
 function showNotification() {
-	if (window.webkitNotifications != null && window.webkitNotifications.checkPermission() > 0) {
+	if (Notification.permission !== "granted") {
             RequestPermission(showNotification);
         } else {
-		if(notification === null)
+		if(lastNotification === null)
 			return;
-		//createHTMLNotification has been removed from some spec: https://plus.google.com/u/0/+GoogleChromeDevelopers/posts/8vWo8hq4pDm
 		var iconstr = null;
-		if(notification.icon != undefined && notification.icon != null && notification.icon != "undefined" && notification.icon != "null") {
-			iconstr = notification.icon.replace(/_/g,'/').replace(/-/g,'+');
+		if(lastNotification.icon != undefined && lastNotification.icon != null && lastNotification.icon != "undefined" && lastNotification.icon != "null") {
+			iconstr = lastNotification.icon.replace(/_/g,'/').replace(/-/g,'+');
 		}
-		if(notification.sound != undefined && notification.sound != null && notification.sound != "undefined" && notification.sound != "null") {
-			soundstr = notification.sound.replace(/_/g,'/').replace(/-/g,'+');
+		if(lastNotification.sound != undefined && lastNotification.sound != null && lastNotification.sound != "undefined" && lastNotification.sound != "null") {
+			soundstr = lastNotification.sound.replace(/_/g,'/').replace(/-/g,'+');
 			if(document.getElementById('soundCheck').checked) {
 				var audio = $('<audio>');
 				var source = $('<source>').attr('src', soundstr).appendTo(audio);
@@ -76,12 +75,12 @@ function showNotification() {
 			}
 		}
 		if(document.getElementById('enabledCheck').checked) {
-			var popup = window.webkitNotifications.createNotification(iconstr, notification.app, notification.text);
-		        popup.show();
+			var popup = new Notification(lastNotification.app, { body: lastNotification.text, icon: iconstr });
+		        //popup.show();
 			var timeout = document.getElementById('timeoutBox').value;
 			if(timeout && timeout != "" && !isNaN(timeout) && timeout > 0) {
 			        setTimeout(function(){
-					popup.cancel();
+					popup.close();
 			        }, timeout * 1000);
 			}
 		}
@@ -90,11 +89,11 @@ function showNotification() {
 		if(iconstr !== null) {
 			row += '<img src="' + iconstr + '"/>';
 		}
-		row += '</td><td class="appname">' + notification.app + '</td>';
-		row += '<td class="time">' + notification.time + '</td>';
+		row += '</td><td class="appname">' + lastNotification.app + '</td>';
+		row += '<td class="time">' + lastNotification.time + '</td>';
 		row += '</tr><tr>';
 		row += '<td class="text" colspan="2">';
-		row += notification.text;
+		row += lastNotification.text;
 		row += '</td></tr>';
 		var rowDom = $(row);
 		rowDom.bind("contextmenu", function (e) {
